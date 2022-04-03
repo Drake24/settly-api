@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Values\ServerMessages;
+
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class AdminRequest
+class AdminRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +29,11 @@ class AdminRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'email' => 'required|email|unique:admin',
-            'password' => Password::min(8)->mixedCase()->symbols()->numbers(),
+            'firstName' => 'required',
+            'lastName' => 'required',
+            'email' => 'required|email|unique:admins',
+            'emailRepeat' => 'required|same:email',
+            'password' => ['required', Password::min(8)->mixedCase()->symbols()->numbers()],
             'passwordRepeat' => 'required|same:password'
         ];
     }
@@ -48,12 +52,22 @@ class AdminRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator)
+
+    /**
+     * Failed validation.
+     *
+     * @param Validator $validator
+     *
+     * @return HttpResponseException
+     */
+    protected function failedValidation(Validator $validator): HttpResponseException
     {
+        $this->errorData->setMessage(ServerMessages::FORM_VALIDATION_ERROR);
+        $this->errorData->setData($validator->errors());
+        $this->errorData->setCode(423);
+
         throw new HttpResponseException(
-            response()->json(
-                $validator->errors()
-            )
+            response()->json($this->errorData->build(), 423)
         );
     }
 }

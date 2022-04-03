@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Values\ServerMessages;
+
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ClientRequest
+use Log;
+
+class ClientRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,11 +30,12 @@ class ClientRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'email' => 'required|email|unique:client',
-            'password' => Password::min(8)->mixedCase()->symbols()->numbers(),
-            'passwordRepeat' => 'required|same:password'
+            'firstName' => 'required',
+            'lastName' => 'required',
+            // Ignore same email if editing own client
+            'email' => 'required|email|unique:clients,email,' . request()->route('client')
         ];
+
     }
 
     /**
@@ -48,12 +52,21 @@ class ClientRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator)
+    /**
+     * Failed validation.
+     *
+     * @param Validator $validator
+     *
+     * @return HttpResponseException
+     */
+    protected function failedValidation(Validator $validator): HttpResponseException
     {
+        $this->errorData->setMessage(ServerMessages::FORM_VALIDATION_ERROR);
+        $this->errorData->setData($validator->errors());
+        $this->errorData->setCode(423);
+
         throw new HttpResponseException(
-            response()->json(
-                $validator->errors()
-            )
-        );
+            response()->json($this->errorData->build(), 423)
+        );;
     }
 }

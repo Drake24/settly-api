@@ -2,27 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AdminRequest;
+use App\Services\AdminService;
 
 class AdminController extends Controller
 {
-    public function index()
+    protected $adminService;
+
+    public function __construct(AdminService $adminService)
     {
+        $this->adminService = $adminService;
     }
 
-    public function store()
+    /**
+     * Creates a new admin user.
+     *
+     * @param AdminRequest $adminRequest
+     *
+     * @return [type]
+     */
+    public function store(AdminRequest $adminRequest)
     {
-    }
+        $payload = [
+            'first_name' => $adminRequest->get('firstName'),
+            'last_name' => $adminRequest->get('lastName'),
+            'email' => $adminRequest->get('email'),
+            'emailRepeat' => $adminRequest->get('emailRepeat'),
+            'password' => $adminRequest->get('password'),
+            'passwordRepeat' => $adminRequest->get('passwordRepeat'),
+            'recaptcha' => $adminRequest->get('recaptcha'),
+        ];
 
-    public function show()
-    {
-    }
+        $adminUser = $this->adminService->createAdmin($payload);
 
-    public function update()
-    {
-    }
-
-    public function destroy()
-    {
+        return $adminUser;
     }
 }

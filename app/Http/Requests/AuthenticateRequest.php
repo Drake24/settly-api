@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Values\ServerMessages;
+
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 use Log;
 
-class AuthenticateRequest extends FormRequest
+class AuthenticateRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -46,13 +47,22 @@ class AuthenticateRequest extends FormRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator)
+    /**
+     * Failed validation.
+     *
+     * @param Validator $validator
+     *
+     * @return HttpResponseException
+     */
+    protected function failedValidation(Validator $validator): HttpResponseException
     {
-        Log::info('test validation');
+        $this->errorData->setMessage(ServerMessages::FORM_VALIDATION_ERROR);
+        $this->errorData->setData($validator->errors());
+        $this->errorData->setCode(423);
 
         throw new HttpResponseException(
             response()->json(
-                $validator->errors()
+                $this->errorData->build(), 423
             )
         );
     }

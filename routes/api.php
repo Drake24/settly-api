@@ -3,7 +3,8 @@
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\AuthenticateController;
+use App\Http\Controllers\Auth\AuthenticateController;
+use App\Http\Controllers\ClientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,4 +22,9 @@ use App\Http\Controllers\AuthenticateController;
 // });
 
 Route::post('authenticate', [AuthenticateController::class, 'authenticate']);
-Route::apiResource('admin', AdminController::class);
+Route::apiResource('admins', AdminController::class);
+
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::apiResource('clients', ClientController::class);
+});
+
