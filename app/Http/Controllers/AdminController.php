@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AdminRequest;
 use App\Services\AdminService;
+use App\Classes\Response;
+use Illuminate\Http\JsonResponse;
 
 class AdminController extends Controller
 {
@@ -21,8 +23,10 @@ class AdminController extends Controller
      *
      * @return [type]
      */
-    public function store(AdminRequest $adminRequest)
+    public function store(AdminRequest $adminRequest): JsonResponse
     {
+        $response = new Response();
+
         $payload = [
             'first_name' => $adminRequest->get('firstName'),
             'last_name' => $adminRequest->get('lastName'),
@@ -35,6 +39,9 @@ class AdminController extends Controller
 
         $adminUser = $this->adminService->createAdmin($payload);
 
-        return $adminUser;
+        return response()->json(
+            $response->build($adminUser),
+            200
+        );
     }
 }

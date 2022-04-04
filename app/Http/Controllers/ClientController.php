@@ -42,7 +42,7 @@ class ClientController extends Controller
      *
      * @return [type]
      */
-    public function store(ClientRequest $clientRequest)
+    public function store(ClientRequest $clientRequest): JsonResponse
     {
         $payload = [
             'first_name' => $clientRequest->get('firstName'),
