@@ -44,6 +44,8 @@ class ClientController extends Controller
      */
     public function store(ClientRequest $clientRequest): JsonResponse
     {
+        $response = new Response();
+
         $payload = [
             'first_name' => $clientRequest->get('firstName'),
             'last_name' => $clientRequest->get('lastName'),
@@ -53,7 +55,10 @@ class ClientController extends Controller
 
         $client = $this->clientService->createClientUser($payload);
 
-        return $client;
+        return response()->json(
+            $response->build($client),
+            200
+        );
     }
 
     /**
