@@ -14,6 +14,7 @@ To start with the application run:
 `php artisan migrate`
 
 Sending of email with `Mailgun` is also configured.
+Screenshot of the recieved email can be found at `public/sample-email`
 ## Application Structure
 
 | File/Folder |  Description|
@@ -22,7 +23,7 @@ Sending of email with `Mailgun` is also configured.
 | app/models| contains the entity objects mapped to database tables |
 | app/services| contains the service layer, business logic, etc|
 | app/values| contains static/constant values used in the application|
-| app/services| contains the service layer, api call, caching|
+| app/services| contains the service layer, api calls|
 | app/console/commands| contains CRON job functions|
 | app/http/requests| contains the 'Request' layer for handling form validations
 | resources/views/emails| contains the template for the email

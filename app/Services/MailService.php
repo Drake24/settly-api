@@ -31,13 +31,15 @@ class MailService extends Mailable
     public function sendClientListsWeekly(): void
     {
         $clients = $this->clientService->getClientsList();
-
+        Log::info('mailable');
         // Mail is sent through the Mailgun driver. Additional details
         // of configuration is in the .env.example file.
         try {
             Mail::send('emails.client-lists', ["clients" => $clients], function ($message) {
                 // temporarily set my email for testing
-                $message->to('paolo.nunal24@gmail.com', 'Weekly Client Lists')->subject('Weekly Client Lists');
+                // however, changing email will prompt error as this is the only email in the
+                // configured in the sandbox.
+                $message->to('drakandriel24@gmail.com', 'Weekly Client Lists')->subject('Weekly Client Lists');
                 $message->from('settly-test@settly.com', 'No Reply');
             });
             // Sending clients...
