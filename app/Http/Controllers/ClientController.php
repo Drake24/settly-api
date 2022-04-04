@@ -48,7 +48,6 @@ class ClientController extends Controller
             'first_name' => $clientRequest->get('firstName'),
             'last_name' => $clientRequest->get('lastName'),
             'email' => $clientRequest->get('email'),
-            'profile_photo' => $clientRequest->file('profilePhoto') ?? null,
             'file' => $clientRequest->file('file') ?? null,
         ];
 
@@ -92,7 +91,6 @@ class ClientController extends Controller
             'first_name' => $clientRequest->get('firstName'),
             'last_name' => $clientRequest->get('lastName'),
             'email' => $clientRequest->get('email'),
-            'profile_photo' => $clientRequest->file('profilePhoto') ?? null,
             'file' => $clientRequest->file('file') ?? null,
         ];
 

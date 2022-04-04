@@ -5,24 +5,28 @@ namespace App\Services;
 use App\Models\Client;
 use App\Values\ServerMessages;
 use App\Traits\AuthenticatedUserTrait;
+use App\Services\PhotoService;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Database\Eloquent\Collection;
 
 use Exception;
+use Log;
 
 class ClientService extends Service
 {
     use AuthenticatedUserTrait;
 
     protected $client;
+    protected $photoService;
 
-    public function __construct(Client $client)
+    public function __construct(Client $client, PhotoService $photoService)
     {
         parent::__construct();
 
         $this->client = $client;
+        $this->photoService = $photoService;
     }
 
     /**
@@ -84,16 +88,21 @@ class ClientService extends Service
      */
     public function createClientUser(array $payload = []): Client
     {
+        $file = $payload['file'];
+
+        if ($file) {
+            $fileName = $this->photoService->prepareFile($file);
+            $payload['file']->move(public_path('images'), $fileName);
+        }
+
         try {
             $client = $this->client->create([
                 'first_name' => $payload['first_name'],
                 'last_name' => $payload['last_name'],
                 'email' => $payload['email'],
-                // 'profile_photo' => $payload['profile_photo'],
+                'profile_photo' => $fileName ?? null,
                 'admin_id' => $this->id(),
             ]);
-
-            $payload['file']->move(public_path('images'), 'test.jpg');
         } catch (Exception $e) {
 
             $this->errorData->setMessage(ServerMessages::SERVER_CLIENT_CREATE_FAILURE);
@@ -177,10 +186,19 @@ class ClientService extends Service
     public function updateClient(int $clientId, array $payload): Client
     {
         $client = $this->client->findOrFail($clientId);
+
+        $file = $payload['file'];
+
+        if ($file) {
+            $fileName = $this->photoService->prepareFile($file);
+            $payload['file']->move(public_path('images'), $fileName);
+        }
+
         try {
             $client->first_name = $payload['first_name'];
             $client->last_name = $payload['last_name'];
             $client->email = $payload['email'];
+            $client->profile_photo = $fileName ?? null;
             $client->save();
         } catch (Exception $e) {
 

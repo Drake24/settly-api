@@ -32,12 +32,16 @@ class MailService extends Mailable
     {
         $clients = $this->clientService->getClientsList();
 
+        // Mail is sent through the Mailgun driver. Additional details
+        // of configuration is in the .env.example file.
         try {
             Mail::send('emails.client-lists', ["clients" => $clients], function ($message) {
                 // temporarily set my email for testing
                 $message->to('paolo.nunal24@gmail.com', 'Weekly Client Lists')->subject('Weekly Client Lists');
                 $message->from('settly-test@settly.com', 'No Reply');
             });
+            // Sending clients...
+            Log::info($clients);
         } catch (Exception $e) {
             Log::info('There is something wrong sending email.' . $e);
         }

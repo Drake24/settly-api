@@ -8,6 +8,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 use Log;
+use Route;
 
 class ClientRequest extends Request
 {
@@ -33,7 +34,7 @@ class ClientRequest extends Request
             'firstName' => 'required',
             'lastName' => 'required',
             // Ignore same email if editing own client
-            'email' => 'required|email|unique:clients,email,' . request()->route('client')
+            'email' => 'required|email|unique:clients,email,' . request()->route('id')
         ];
 
     }
@@ -67,6 +68,6 @@ class ClientRequest extends Request
 
         throw new HttpResponseException(
             response()->json($this->errorData->build(), 423)
-        );;
+        );
     }
 }
